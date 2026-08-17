@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cutlass — The video editor you don't have to learn</title>
+<link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"%3E%3Cdefs%3E%3ClinearGradient id="b" x1="0" y1="1" x2="1" y2="0"%3E%3Cstop offset="0" stop-color="%23c8941f"/%3E%3Cstop offset=".5" stop-color="%23f6d06c"/%3E%3Cstop offset="1" stop-color="%23c8941f"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x="8" y="8" width="240" height="240" rx="54" fill="%231a1a1c"/%3E%3Cpolygon points="93,173 93,189 189,133 153.6,112.4" fill="%23d9dde3" stroke="%23d9dde3" stroke-width="7" stroke-linejoin="round"/%3E%3Cpolygon points="83,67 83,163 143.6,102.4" fill="%23ffffff" stroke="%23ffffff" stroke-width="7" stroke-linejoin="round"/%3E%3Cline x1="64" y1="192" x2="192" y2="64" stroke="url(%23b)" stroke-width="10" stroke-linecap="round"/%3E%3C/svg%3E' />
+<meta name="description" content="Cutlass is a dead-simple video editor for Windows that turns your footage into Shorts, Reels, and TikToks — reframe to vertical with no black bars, split a long video into clips, add captions in one click. Edit by deleting words, blur out anything, grade in one click. Own it forever with a one-time purchase — no subscription. Free 7-day trial." />
+<style>
+  :root {
+    --bg: #181818; --panel: #202020; --border: #2d2d2d;
+    --gold: #e8b339; --blue: #4a90ff; --ok: #3fb950; --warn: #f0b429;
+    --text: #e8eaee; --muted: #9ba1ac;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: Inter, "Segoe UI", system-ui, sans-serif;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+  header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 18px 0;
+  }
+  .logo { font-weight: 800; font-size: 20px; letter-spacing: 0.01em; }
+  .logo .blade { color: var(--gold); }
+  nav { margin-left: auto; display: flex; gap: 22px; font-size: 14px; }
+  nav a { color: var(--muted); text-decoration: none; transition: color 160ms; }
+  nav a:hover { color: var(--text); }
+
+  .hero { padding: 88px 0 64px; text-align: center; }
+  .hero .eyebrow {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--blue); font-weight: 700; margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-size: clamp(38px, 6vw, 64px); font-weight: 800; line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 .gold { color: var(--blue); }
+  .hero p.sub {
+    margin: 22px auto 0; max-width: 640px; font-size: 19px; color: var(--muted);
+  }
+  .cta-row { margin-top: 36px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 13px 28px; border-radius: 9px;
+    font-weight: 700; font-size: 15px; text-decoration: none;
+    transition: filter 160ms, transform 160ms;
+  }
+  .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn.gold { background: linear-gradient(180deg, #5a9bff, var(--blue)); color: #fff; box-shadow: 0 2px 10px rgba(74,144,255,0.35); }
+  .btn.ghost { border: 1px solid var(--border); color: var(--text); }
+  .pledge-line { margin-top: 18px; font-size: 13px; color: var(--muted); }
+  .pledge-line b { color: var(--ok); }
+
+  .demo {
+    margin: 30px auto 0; max-width: 720px; background: var(--panel);
+    border: 1px solid var(--border); border-radius: 14px; padding: 26px 30px;
+    text-align: left; box-shadow: 0 18px 60px rgba(0,0,0,0.5);
+  }
+  .demo .cap { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 12px; }
+  .words { font-size: 20px; line-height: 2; user-select: none; }
+  .w { padding: 2px 4px; border-radius: 5px; }
+  .w.cut { text-decoration: line-through; color: #5a5f68; background: rgba(248,81,73,0.12); }
+  .w.filler { color: var(--warn); text-decoration: underline dotted; }
+  .demo .note { margin-top: 12px; font-size: 13px; color: var(--muted); }
+
+  section { padding: 72px 0; border-top: 1px solid var(--border); }
+  h2 { font-size: 30px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 10px; }
+  .lead { color: var(--muted); max-width: 640px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-top: 36px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 24px; transition: border-color 160ms, transform 160ms;
+  }
+  .card:hover { border-color: #3d3d3d; transform: translateY(-2px); }
+  .card .ico { font-size: 26px; }
+  .card h3 { margin: 12px 0 6px; font-size: 17px; }
+  .card p { font-size: 14px; color: var(--muted); }
+  .card p b { color: var(--text); }
+
+  .pledge { background: linear-gradient(180deg, rgba(74,144,255,0.06), transparent); }
+  .pledge ul { margin-top: 24px; list-style: none; display: grid; gap: 14px; max-width: 640px; }
+  .pledge li { padding-left: 30px; position: relative; font-size: 16px; }
+  .pledge li::before { content: "✓"; position: absolute; left: 0; color: var(--ok); font-weight: 800; }
+  .pledge .fine { margin-top: 26px; font-size: 13px; color: var(--muted); }
+
+  .waitlist { text-align: center; }
+  .waitlist .btn { margin-top: 26px; }
+  footer { border-top: 1px solid var(--border); padding: 28px 0; font-size: 13px; color: var(--muted); display: flex; gap: 18px; flex-wrap: wrap; }
+  footer .wrap { display: flex; gap: 18px; flex-wrap: wrap; width: 100%; }
+  footer span:first-child { margin-right: auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="logo">
+      <svg width="26" height="26" viewBox="0 0 256 256" style="vertical-align:-6px">
+        <defs>
+          <linearGradient id="hb" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0" stop-color="#c8941f"/><stop offset=".5" stop-color="#f6d06c"/><stop offset="1" stop-color="#c8941f"/>
+          </linearGradient>
+        </defs>
+        <polygon points="93,173 93,189 189,133 153.6,112.4" fill="#d9dde3" stroke="#d9dde3" stroke-width="7" stroke-linejoin="round"/>
+        <polygon points="83,67 83,163 143.6,102.4" fill="#ffffff" stroke="#ffffff" stroke-width="7" stroke-linejoin="round"/>
+        <line x1="58" y1="198" x2="198" y2="58" stroke="url(#hb)" stroke-width="12" stroke-linecap="round"/>
+      </svg>
+      Cutlass</span>
+    <nav>
+      <a href="#simple">Why it's simple</a>
+      <a href="#how">How it works</a>
+      <a href="#pledge">The pledge</a>
+      <a href="#waitlist">Download</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <p class="eyebrow">A video editor that finally makes sense</p>
+    <h1>The video editor you<br /><span class="gold">don't have to learn.</span></h1>
+    <p class="sub">
+      Everything you need is right in front of you — no menus to dig through, no
+      tutorials to watch. Turn a long recording into captioned Shorts, Reels, and
+      TikToks, or edit by simply deleting the words you don't want. Open Cutlass
+      and you already know where everything is.
+    </p>
+    <div class="cta-row">
+      <a class="btn gold" href="https://github.com/Cutlass247/cutlass/releases/latest">Download for Windows</a>
+      <a class="btn ghost" href="#how">See how it works</a>
+    </div>
+    <p class="pledge-line"><b>Free 7-day trial, then pay once — yours forever.</b> No subscription. No watermark. Nothing uploaded.</p>
+
+    <div class="demo" id="how">
+      <div class="cap">Your transcript is your timeline</div>
+      <p class="words">
+        <span class="w">So</span>
+        <span class="w filler cut">um</span>
+        <span class="w">this</span>
+        <span class="w">is</span>
+        <span class="w">the</span>
+        <span class="w">launch</span>
+        <span class="w">video</span>
+        <span class="w cut">wait</span>
+        <span class="w cut">let</span>
+        <span class="w cut">me</span>
+        <span class="w cut">start</span>
+        <span class="w cut">over</span>
+        <span class="w filler cut">uh</span>
+        <span class="w">and</span>
+        <span class="w">it</span>
+        <span class="w">cuts</span>
+        <span class="w">itself.</span>
+      </p>
+      <p class="note">
+        Struck-through words are gone from the video — frame-accurate cuts,
+        rippled shut, undoable. Silences and filler words go in one click.
+      </p>
+    </div>
+  </div>
+
+  <section id="simple">
+    <h2>Powerful — but you don't have to be</h2>
+    <p class="lead">
+      Premiere, DaVinci, Final Cut: incredible tools, buried under a hundred
+      panels and a learning curve measured in weeks. Cutlass puts every tool you
+      actually need on one screen, each one labeled in plain words. No hunting,
+      no manual, no “where is that setting?”
+    </p>
+    <div class="grid">
+      <div class="card">
+        <div class="ico">👀</div>
+        <h3>Nothing is hidden</h3>
+        <p>If you can see it, you can use it. Every control is on screen and named for what it does — <b>not buried in a right-click, a submenu, or a shortcut you have to memorize.</b></p>
+      </div>
+      <div class="card">
+        <div class="ico">🧭</div>
+        <h3>No tutorials required</h3>
+        <p>Skip the YouTube playlist and the Reddit search. Import a clip and the next step is obvious. <b>Most people make their first cut in under a minute.</b></p>
+      </div>
+      <div class="card">
+        <div class="ico">🎚️</div>
+        <h3>Grows when you're ready</h3>
+        <p><b>Create</b> mode is a clip maker: pick a shape for Shorts, TikTok, or Reels, add captions, export. Flip to <b>Studio</b> for tracks, effects, and keyframes — same project, same plain UI, just more shown when you ask.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Simple on top. Serious underneath.</h2>
+    <p class="lead">Easy doesn't mean basic. The same plain screen makes vertical clips, burns captions, blurs faces, and grades footage — on a native Rust engine fast enough for 4K on a laptop.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="ico">🎬</div>
+        <h3>Made for vertical</h3>
+        <p>Shoot wide, post tall. Reframe any clip to <b>9:16, 1:1, or 16:9</b> — <b>Fill</b> crops edge-to-edge with no black bars, or drop in a <b>blurred background</b>. Pan to keep your subject centered.</p>
+      </div>
+      <div class="card">
+        <div class="ico">✂️</div>
+        <h3>One video, many shorts</h3>
+        <p>Drop in a long recording and Cutlass <b>splits it into short-ready clips</b> at natural breaks. Pick one, export it, move to the next.</p>
+      </div>
+      <div class="card">
+        <div class="ico">📝</div>
+        <h3>Captions from your words</h3>
+        <p>On-device transcription, then <b>burned-in captions in one click</b>, timed to your speech. Click a word to jump there — delete words and the video cuts with them.</p>
+      </div>
+      <div class="card">
+        <div class="ico">🔲</div>
+        <h3>Blur out anything</h3>
+        <p>Cover a face, a screen, a name. <b>Blur, pixelate, or black-box</b> any region — and <b>motion tracking</b> makes it follow the subject as they move.</p>
+      </div>
+      <div class="card">
+        <div class="ico">🎨</div>
+        <h3>Grade in one click</h3>
+        <p>One-click Looks preview live on your footage — Cinematic, Warm, Noir, and more. Drop in a <b>.cube LUT</b>, pull green screen, punch in, or dial color by hand. <b>No grading degree required.</b></p>
+      </div>
+      <div class="card">
+        <div class="ico">🧹</div>
+        <h3>Smart cuts</h3>
+        <p>Every “um”, “uh”, and dead-air pause found automatically from the transcript. <b>Remove them all in two clicks</b> — one undo brings them back.</p>
+      </div>
+      <div class="card">
+        <div class="ico">⚡</div>
+        <h3>Fast on real hardware</h3>
+        <p>Native engine: 4K decode at 200+ fps, 6&nbsp;ms scrub seeks, hardware-accelerated export. <b>Smooth on laptops, not just workstations.</b></p>
+      </div>
+      <div class="card">
+        <div class="ico">🤝</div>
+        <h3>Multiplayer timelines</h3>
+        <p>Share a room and edit the same timeline together — live cursors, offline edits that merge cleanly. <b>Like a doc, but it's a video edit.</b></p>
+      </div>
+      <div class="card">
+        <div class="ico">🎛️</div>
+        <h3>Two editors in one</h3>
+        <p><b>Create</b> is the clip maker: footage in, captioned vertical clip out. <b>Studio</b> is a full multi-track NLE with effects, titles, and keyframes. Same project — switch anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pledge" id="pledge">
+    <h2>Buy it once. Own it forever.</h2>
+    <p class="lead">Every other editor wants a recurring piece of you — a monthly rental, a watermark, or a license to the work you make. Premiere is <b>$20+ a month, forever</b>. Cutlass is a <b>one-time purchase you keep for good</b>.</p>
+    <ul>
+      <li><b>Pay once — it's yours.</b> No subscription, ever. Buy it and own it, right on your machine.</li>
+      <li><b>Your content is yours.</b> Cutlass claims no license, ever, to anything you create.</li>
+      <li><b>On-device by default.</b> Transcription and editing never upload your footage.</li>
+      <li><b>No watermarks.</b> Not in the trial, not anywhere.</li>
+      <li><b>No lock-in.</b> Your project is an open, documented file with full history — readable forever.</li>
+    </ul>
+    <p class="fine">The whole pledge fits on one page — because terms you can read are terms you can trust.</p>
+  </section>
+
+  <section class="waitlist" id="waitlist">
+    <h2>Get the beta</h2>
+    <p class="lead" style="margin: 0 auto;">Windows 10/11 today. macOS and Linux follow. If you're leaving another editor — we built this for you.</p>
+    <a class="btn gold" href="https://github.com/Cutlass247/cutlass/releases/latest">Download for Windows</a>
+    <p class="pledge-line">Free 7-day trial, then a one-time purchase — yours forever. Not on Windows? <a href="mailto:beta@cutlass.app?subject=Cutlass%20for%20Mac%2FLinux&body=Tell%20me%20when%20it%27s%20ready.%20I%20use%3A%20" style="color: var(--blue);">Tell us to ping you</a> when your platform's ready.</p>
+  </section>
+</div>
+<footer>
+  <div class="wrap">
+    <span>Cutlass — Cut sharper. Own everything.</span>
+    <span>© 2026 Cutlass</span>
+  </div>
+</footer>
+</body>
+</html>
